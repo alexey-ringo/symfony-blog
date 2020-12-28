@@ -10,7 +10,7 @@ class BaseController extends AbstractController
     public function renderDefault()
     {
         return [
-            'title' => 'Значение по умолчанию'
+            'title' => 'Сайт Symfony-Blog'
         ];
     }
 

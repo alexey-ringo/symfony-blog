@@ -11,7 +11,7 @@ class AdminBaseController extends AbstractController
     public function renderDefault()
     {
         return [
-            'title' => 'Значение по умолчанию для Админки'
+            'title' => 'Admin panel'
         ];
     }
 }
