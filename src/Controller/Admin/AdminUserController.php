@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\UserRepositoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,15 +16,26 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AdminUserController extends AdminBaseController
 {
+    private $userRepository;
+
+    /**
+     * AdminUserController constructor.
+     * @param $userRepository
+     */
+    public function __construct(UserRepositoryInterface $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+
     /**
      * @Route("/admin/user", name="admin_user")
      * @return Response
      */
     public function index() {
-        $users = $this->getDoctrine()->getRepository(User::class)->findAll();
         $forRender = parent::renderDefault();
         $forRender['title'] = 'Пользователи';
-        $forRender['users'] = $users;
+        $forRender['users'] = $this->userRepository->getAll();
         return $this->render('admin/user/index.html.twig', $forRender);
     }
 
