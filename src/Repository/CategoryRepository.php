@@ -22,36 +22,32 @@ class CategoryRepository extends ServiceEntityRepository implements CategoryRepo
         parent::__construct($registry, Category::class);
     }
 
-    public function getAllCategory(): array
+    public function getAll(): array
     {
         return parent::findAll();
     }
 
-    public function getOneCategory(int $categoryId): object
+    public function getOne(int $categoryId): object
     {
         return parent::find($categoryId);
     }
 
-    public function setCreateCategory(Category $category): object
+    public function setCreate(Category $category): CategoryRepositoryInterface
     {
-        $category->setCreateAtValue();
-        $category->setUpdateAtValue();
-        $category->setIsPublished();
         $this->manager->persist($category);
         $this->manager->flush();
 
-        return $category;
+        return $this;
     }
 
-    public function setUpdateCategory(Category $category): object
+    public function setSave(Category $category): CategoryRepositoryInterface
     {
-        $category->setUpdateAtValue();
         $this->manager->flush();
 
-        return $category;
+        return $this;
     }
 
-    public function setDeleteCategory(Category $category)
+    public function setDelete(Category $category)
     {
         $this->manager->remove($category);
         $this->manager->flush();

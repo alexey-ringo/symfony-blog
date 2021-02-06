@@ -9,6 +9,7 @@ use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\CategoryRepositoryInterface;
 use App\Repository\PostRepositoryInterface;
+use App\Service\Post\PostServiceInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,17 +21,23 @@ class AdminPostController extends AdminBaseController
     private $categoryRepository;
 
     private $postRepository;
+    /**
+     * @var PostServiceInterface
+     */
+    private $postService;
 
     /**
      * AdminPostController constructor.
-     * @param $categoryRepository
-     * @param $postRepository
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param PostRepositoryInterface $postRepository
+     * @param PostServiceInterface $postService
      */
     public function __construct(CategoryRepositoryInterface $categoryRepository,
-                                PostRepositoryInterface $postRepository)
+                                PostRepositoryInterface $postRepository, PostServiceInterface $postService)
     {
         $this->categoryRepository = $categoryRepository;
         $this->postRepository = $postRepository;
+        $this->postService = $postService;
     }
 
     /**
@@ -40,8 +47,8 @@ class AdminPostController extends AdminBaseController
     {
         $forRender = parent::renderDefault();
         $forRender['title'] = 'Посты';
-        $forRender['post'] = $this->postRepository->getAllPost();
-        $forRender['checkCategory'] = $this->categoryRepository->getAllCategory();
+        $forRender['post'] = $this->postRepository->getAll();
+        $forRender['checkCategory'] = $this->categoryRepository->getAll();
 
         return $this->render('admin/post/index.html.twig', $forRender);
     }
@@ -57,8 +64,7 @@ class AdminPostController extends AdminBaseController
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
-            $file = $form->get('image')->getData();
-            $this->postRepository->setCreatePost($post, $file);
+            $this->postService->handleCreate($form, $post);
             $this->addFlash('success', 'Пост добавлен');
             return $this->redirectToRoute('admin_post');
         }
@@ -70,26 +76,25 @@ class AdminPostController extends AdminBaseController
     }
 
     /**
-     * @Route("/admin/post/update/{id}", name="admin_post_update")
+     * @Route("/admin/post/update/{postId}", name="admin_post_update")
      * @param int $id
      * @param Request $request
      * @return RedirectResponse|Response
      */
-    public function update(int $id, Request $request)
+    public function update(int $postId, Request $request)
     {
         /** @var Post $post */
-        $post = $this->postRepository->getOnePost($id);
+        $post = $this->postRepository->getOne($postId);
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
             if($form->get('save')->isClicked()) {
-                $file = $form->get('image')->getData();
-                $this->postRepository->setUpdatePost($post, $file);
+                $this->postService->handleUpdate($form, $post);
                 $this->addFlash('success', 'Пост обновлен');
 
             }
             if($form->get('delete')->isClicked()) {
-                $this->postRepository->setDeletePost($post);
+                $this->postService->handleDelete($post);
                 $this->addFlash('success', 'Пост удален');
             }
 

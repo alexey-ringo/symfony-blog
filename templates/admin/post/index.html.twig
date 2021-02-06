@@ -1,6 +1,6 @@
 {% extends 'admin/adminbase.html.twig' %}
-{% block title %}{{ title }}{% endblock %}
 {% block body %}
+
     <div class="container-fluid">
         <div class="row no-gutters">
             <div class="col-12">
@@ -10,18 +10,10 @@
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="row no-gutters">
-            {% if checkCategory is not empty %}
-                <div class="col-12 mt-5">
-                    <a href="{{ path('admin_post_create') }}" class="btn btn-success">Создать пост</a>
-                </div>
-            {% endif %}
-        </div>
-    </div>
 
-    <div class="container-fluid">
-        <div class="row no-gutters justify-content-center">
+
+    <div class="container">
+        <div class="row no-gutters justify-content-center mt-3">
             <div class="col-8">
                 {% for message in app.flashes('success') %}
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -35,14 +27,13 @@
         </div>
     </div>
 
-
     <div class="container">
         <div class="row no-gutters">
             <div class="col-12">
                 {% if checkCategory is empty %}
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <p>
-                            Создание постов невозможно. Сначала создай категорию.
+                            Создание постов невозможно, сначала создай категорию.
                         </p>
                         <hr>
                         <a href="{{ path('admin_category_create') }}">
@@ -51,21 +42,44 @@
                     </div>
                 {% else %}
                     <h2>Список постов</h2>
-                    <ul>
+                    <div class="row no-gutters">
                         {% for post_item in post %}
-                            <li>
-                                <img src="{{ asset('uploads/post/') }}{{ post_item.image }}"
-                                     style="width: 100px;" alt=""
-                                >
-                                {{ post_item.title }}
-                                <a href="{{ path('admin_post_update', {'id': post_item.id }) }}" class="btn-link">
-                                    Редактровать
-                                </a>
-                            </li>
+                            <div class="col-4 p-2">
+                                <div class="card" style="width:100%;">
+
+                                    {% if post_item.image is null %}
+                                        <img class="card-img-top" src="" alt="Card image cap">
+                                    {% else %}
+                                        <img class="card-img-top" style="max-height: 200px; overflow: hidden;"
+                                             src="{{ asset('uploads/post/') }}{{ post_item.image }}"
+                                             alt="">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h6 class="text-muted"> {{ post_item.category.title }}</h6>
+                                        <h5 class="card-title"> {{ post_item.title }}</h5>
+                                        <a href="{{ path('admin_post_update', {'postId': post_item.id}) }}"
+                                           class="btn btn-success">
+                                            Редактровать
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% endif %}
             </div>
         </div>
     </div>
+
+
+    <div class="container">
+        <div class="row no-gutters">
+            {% if checkCategory is not empty %}
+                <div class="col-12 mt-5">
+                    <a href="{{ path('admin_post_create') }}" class="btn btn-success">Создать пост</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
 {% endblock %}

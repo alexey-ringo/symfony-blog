@@ -17,65 +17,42 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class PostRepository extends ServiceEntityRepository implements PostRepositoryInterface
 {
-    private $em;
-    private $fm;
+    private $entityManager;
 
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $manager,
-                                FileManagerServiceInterface $fileManagerService)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
-        $this->em = $manager;
-        $this->fm = $fileManagerService;
+        $this->entityManager = $entityManager;
         parent::__construct($registry, Post::class);
     }
 
-    public function getAllPost(): array
+    public function getAll(): array
     {
         return parent::findAll();
     }
 
-    public function getOnePost(int $postId): object
+    public function getOne(int $postId): object
     {
         return parent::find($postId);
     }
 
-    public function setCreatePost(Post $post, UploadedFile $file = null): object
+    public function setCreate(Post $post): PostRepositoryInterface
     {
-        if($file) {
-            $fileName = $this->fm->imagePostUpload($file);
-            $post->setImage($fileName);
-        }
-        $post->setCreateAtValue();
-        $post->setUpdateAtValue();
-        $post->setIsPublished();
-        $this->em->persist($post);
-        $this->em->flush();
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
 
-        return $post;
+        return $this;
     }
 
-    public function setUpdatePost(Post $post, UploadedFile $file = null): object
+    public function setSave(Post $post): PostRepositoryInterface
     {
-        $fileName = $post->getImage();
-        if($file) {
-            if($fileName) {
-                $this->fm->removePostImage($fileName);
-            }
-            $fileName = $this->fm->imagePostUpload($file);
-            $post->setImage($fileName);
-        }
-        $post->setUpdateAtValue();
-        $this->em->flush();
+        $this->entityManager->flush();
 
-        return $post;
+        return $this;
     }
 
-    public function setDeletePost(Post $post)
+    public function setDelete(Post $post)
     {
-        $image = $post->getImage();
-        if($image) {
-            $this->fm->removePostImage($image);
-        }
-        $this->em->remove($post);
-        $this->em->flush();
+        $this->entityManager->remove($post);
+        $this->entityManager->flush();
     }
 }
