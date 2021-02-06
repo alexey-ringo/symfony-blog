@@ -4,37 +4,34 @@
 namespace App\Repository;
 
 use App\Entity\Post;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 interface PostRepositoryInterface
 {
     /**
      * @return Post[]
      */
-    public function getAllPost(): array;
+    public function getAll(): array;
 
     /**
      * @param int $postId
      * @return Post
      */
-    public function getOnePost(int $postId): object;
+    public function getOne(int $postId): object;
 
     /**
      * @param Post $post
-     * @param UploadedFile|null $file
-     * @return object
+     * @return $this
      */
-    public function setCreatePost(Post $post, UploadedFile $file = null): object;
+    public function setCreate(Post $post): self;
 
     /**
      * @param Post $post
-     * @param UploadedFile|null $file
-     * @return object
+     * @return $this
      */
-    public function setUpdatePost(Post $post, UploadedFile $file = null): object;
+    public function setSave(Post $post): self;
 
     /**
      * @param Post $post
      */
-    public function setDeletePost(Post $post);
+    public function setDelete(Post $post);
 }

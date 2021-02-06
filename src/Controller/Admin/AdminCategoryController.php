@@ -8,6 +8,7 @@ use App\Entity\Category;
 
 use App\Form\CategoryType;
 use App\Repository\CategoryRepositoryInterface;
+use App\Service\Category\CategoryService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,12 +23,18 @@ class AdminCategoryController extends AdminBaseController
     private $categoryRepository;
 
     /**
+     * @var CategoryService
+     */
+    private $categoryService;
+
+    /**
      * AdminCategoryController constructor.
      * @param $categoryRepository
      */
-    public function __construct(CategoryRepositoryInterface $categoryRepository)
+    public function __construct(CategoryRepositoryInterface $categoryRepository, CategoryService $categoryService)
     {
         $this->categoryRepository = $categoryRepository;
+        $this->categoryService = $categoryService;
     }
 
     /**
@@ -39,7 +46,7 @@ class AdminCategoryController extends AdminBaseController
 
         $forRender = parent::renderDefault();
         $forRender['title'] = 'Категории';
-        $forRender['category'] = $this->categoryRepository->getAllCategory();
+        $forRender['category'] = $this->categoryRepository->getAll();
 
         return $this->render('admin/category/index.html.twig', $forRender);
     }
@@ -55,7 +62,7 @@ class AdminCategoryController extends AdminBaseController
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
-            $this->categoryRepository->setCreateCategory($category);
+            $this->categoryService->handleCreate($category);
             $this->addFlash('success', 'Категория добавлена');
             return $this->redirectToRoute('admin_category');
         }
@@ -67,24 +74,24 @@ class AdminCategoryController extends AdminBaseController
     }
 
     /**
-     * @Route("/admin/category/update/{id}", name="admin_category_update")
+     * @Route("/admin/category/update/{categoryId}", name="admin_category_update")
      * @param int $id
      * @param Request $request
      * @return RedirectResponse|Response
      */
-    public function update(int $id, Request $request)
+    public function update(int $categoryId, Request $request)
     {
-        $category = $this->categoryRepository->getOneCategory($id);
+        $category = $this->categoryRepository->getOne($categoryId);
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
             if($form->get('save')->isClicked()) {
-                $this->categoryRepository->setUpdateCategory($category);
+                $this->categoryService->handleUpdate($category);
                 $this->addFlash('success', 'Категория обновлена');
 
             }
             if($form->get('delete')->isClicked()) {
-                $this->categoryRepository->setDeleteCategory($category);
+                $this->categoryService->handleDelete($category);
                 $this->addFlash('success', 'Категория удалена');
             }
 

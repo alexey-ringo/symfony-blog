@@ -11,28 +11,28 @@ interface CategoryRepositoryInterface
     /**
      * @return Category[]
      */
-    public function getAllCategory(): array;
+    public function getAll(): array;
 
     /**
      * @param int $categoryId
      * @return Category
      */
-    public function getOneCategory(int $categoryId): object;
+    public function getOne(int $categoryId): object;
 
     /**
      * @param Category $category
-     * @return object
+     * @return $this
      */
-    public function setCreateCategory(Category $category): object;
+    public function setCreate(Category $category): self;
 
     /**
      * @param Category $category
-     * @return object
+     * @return $this
      */
-    public function setUpdateCategory(Category $category): object;
+    public function setSave(Category $category): self;
 
     /**
      * @param Category $category
      */
-    public function setDeleteCategory(Category $category);
+    public function setDelete(Category $category);
 }
